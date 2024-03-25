@@ -11,6 +11,7 @@ internal class Program
         public string username;
         public sayaTubeUser(string username)
         {
+            Debug.Assert(username.Length <= 100 && username != null, "jumlah kata melebihi batas");
             Random random = new Random();
             this.username = username;
             this.id = random.Next(10000,99999);
@@ -27,7 +28,9 @@ internal class Program
             return totalVideo;  
         }
         public void addVideo(sayaTubeVideo video)
+
         {
+            Debug.Assert(video != null && video.getPlayCount() < int.MaxValue);
             this.uploadedVideos.Add(video);           
         }
         public void printAllVideoPlayCount()
@@ -36,7 +39,16 @@ internal class Program
             for (int i = 0; i < uploadedVideos.Count;i++)
             {
                 Console.WriteLine($"video {i + 1} judul {uploadedVideos[i].getTitle()}");
+                if(i + 1> 7)
+                {
+                    Debug.Assert(uploadedVideos.Count <=8);
+
+                }
             }
+        }
+        public List<sayaTubeVideo> getVideo()
+        {
+            return uploadedVideos;
         }
 
     }
@@ -47,15 +59,27 @@ internal class Program
         private int PlayCount;
         public sayaTubeVideo(string title)
         {
+            Debug.Assert(title.Length <= 200 && title != null, "jumlah kata melebihi batas");
             Random random = new Random();
             this.title = title;
             id = random.Next(10000,99999);
             PlayCount = 0;
 
         }
-        public void increasePlaycount(int PlayCount)
+        public void increasePlaycount(int playcount)
         {
-             this.PlayCount += PlayCount;
+            Debug.Assert(playcount <= 25000000 && playcount >= 0, "Jumlah playcount melebihi batas");
+            try
+            {
+                checked
+                {
+                    this.PlayCount += playcount;
+                }
+            }
+            catch (OverflowException)
+            {
+                Console.WriteLine("Terjadi overflow pada penambahan play count.");
+            }
         }
         public void printVideoDetail()
         {
@@ -75,17 +99,16 @@ internal class Program
     private static void Main(string[] args)
     {
         sayaTubeUser userName = new sayaTubeUser("Hafid al akhyar");
+
+        for(int i = 0; i < 10; i++)
+        {
+            Console.WriteLine("judul film : ");
+            userName.addVideo(new sayaTubeVideo("tes "+(i +1)));
+            userName.getVideo()[i].increasePlaycount(i+90);
+            userName.getVideo()[i].printVideoDetail();
+        }
         
-        userName.addVideo(new sayaTubeVideo("tes1"));
-        userName.addVideo(new sayaTubeVideo("tes2"));
-        userName.addVideo(new sayaTubeVideo("tes3"));
-        userName.addVideo(new sayaTubeVideo("tes4"));
-        userName.addVideo(new sayaTubeVideo("tes5"));
-        userName.addVideo(new sayaTubeVideo("tes6"));
-        userName.addVideo(new sayaTubeVideo("tes7"));
-        userName.addVideo(new sayaTubeVideo("tes8"));
-        userName.addVideo(new sayaTubeVideo("tes9"));
-        userName.addVideo(new sayaTubeVideo("tes10"));
+
         userName.printAllVideoPlayCount();
     }
 }
